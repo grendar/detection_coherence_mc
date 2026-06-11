@@ -1,2 +1,2 @@
 # detection_coherence
-R scripts accompanying the detection coherence framework
+R scripts accompanying Detection Coherence of Tests
