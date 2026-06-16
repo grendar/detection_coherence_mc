@@ -1,2 +1,2 @@
-# detection_coherence
-R scripts accompanying Detection Coherence of Tests
+# detection_coherence_mc
+R scripts for Monte Carlo studies in Detection Coherence of Tests
