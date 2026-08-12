@@ -1,5 +1,5 @@
 # detection_coherence_mc
-R scripts for Monte Carlo studies in Detection Coherence of Tests
+R scripts for Monte Carlo studies in Detection Coherence of Tests ([Grendár 2026](#ref-grendar2026dct))
 
 # References
 
