@@ -115,6 +115,23 @@ for (n in n_vals) {
 # 2000   0.1450     0.1416
 # 5000   0.1390     0.1416
 #
+#
+
+#─ Session info ───────────────────────────────────────────────────────────────
+# setting  value
+# version  R version 4.4.0 (2024-04-24)
+# os       CentOS Stream 8
+# system   x86_64, linux-gnu
+# ui       RStudio
+# language
+# collate  en_US.UTF-8
+# ctype    en_US.UTF-8
+# tz       Europe/Bratislava
+# date     2026-08-11
+# rstudio  2024.12.1+563 Kousa Dogwood (desktop)
+# pandoc   2.0.6 @ /usr/bin/pandoc
+# quarto   1.5.57 @ /usr/lib/rstudio/resources/app/bin/quarto/bin/quarto
+#
 
 
 
