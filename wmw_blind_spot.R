@@ -126,75 +126,74 @@ cat(sprintf("  N(0,1) vs N(0,%.0f): c(P*) ~= %.3f\n\n",
 # MC of power for growing n
 #
 set.seed(123L)
-n_vals <- c(5, 25, 50, 100, 200, 500, 1000, 2000, 5000)
+n_vals <- c(25, 50, 100, 200, 500, 1000, 2000, 5000)
 #
 pow <- data.frame(
-  n      = n_vals,
+  n      = rep(n_vals, 2),
   power  = NA_real_,
-  lower = NA_real_,
-  upper = NA_real_)
+  series = rep(c(
+    sprintf("Blind spot", sigma_bs^2),    # [AUC = 1/2, N(0,1) vs N(0,%d)]
+    sprintf("Non-blind spot")),    # [AUC \u2260 1/2, N(\u03bc,1) vs N(0,1)]
+    each = length(n_vals))
+)
 #
 #
 for (j in seq_along(n_vals)) {
   n <- n_vals[j]
   pv_b <- replicate(N_sim,
                     wmw_pval(rnorm(n), rnorm(n, 0, sigma_bs)))
-  power <- mean(pv_b < alpha, na.rm = TRUE)
-  #
-  se    <- sqrt(power * (1 - power) / N_sim)  # MC uncertainty
-  pow$lower[j] <- power - 1.96 * se
-  pow$upper[j] <- power + 1.96 * se
-  #
-  pow$power[j] = power
-  #
+  pv_n <- replicate(N_sim,
+                    wmw_pval(rnorm(n, mu_near), rnorm(n)))
+  pow$power[j]                  <- mean(pv_b < alpha, na.rm = TRUE)
+  pow$power[j + length(n_vals)] <- mean(pv_n < alpha, na.rm = TRUE)
+  #  
 }
 #
-round(pow, 3)
-# n power lower upper
-# 1    5 0.064 0.057 0.072
-# 2   25 0.086 0.077 0.094
-# 3   50 0.093 0.084 0.102
-# 4  100 0.098 0.089 0.108
-# 5  200 0.100 0.091 0.109
-# 6  500 0.099 0.090 0.108
-# 7 1000 0.097 0.088 0.106
-# 8 2000 0.099 0.090 0.109
-# 9 5000 0.094 0.085 0.103
-#
+# save it
+# saveRDS(pow, 'power_WMW_MC.RDS')
+# load it
+# pow = readRDS('power_WMW_MC.RDS')
 
 
+# =============================================================
+# Plot
+# =============================================================
+#
+col_blind <- "#c0392b"
+col_near  <- "#2980b9"
 
-###############################################################
-#
-# Plot of power as fnc of sample size
-#
-col_blind = 'red'
-#
-p <- ggplot(pow, aes(x = n, y = power)) +
+pow$series <- factor(pow$series,
+                     levels = unique(pow$series))
+
+p <- ggplot(pow, aes(x = n, y = power,
+                            colour = series, shape = series)) +
   geom_hline(yintercept = power_pratt, linetype = "dashed",
-             linewidth = 0.5, alpha = 0.6) +
+             colour = col_blind, linewidth = 0.5, alpha = 0.6) +
   geom_line(linewidth = 0.9) +
   geom_point(size = 2.5) +
   scale_x_log10(breaks = n_vals,
                 labels = as.character(n_vals)) +
-  scale_y_continuous(limits = c(0, 0.2),
-                     breaks = seq(0, 0.2, 0.1)) +
-  annotate("text", x = 4500, y = power_pratt - 0.01,
-           label = sprintf("van der Vaart - Pratt limit %.3f", power_pratt),
+  scale_y_continuous(limits = c(0, 1.02),
+                     breaks = seq(0, 1, 0.2)) +
+  scale_colour_manual(values = c(col_blind, col_near)) +
+  scale_shape_manual(values  = c(16, 17)) +
+  annotate("text", x = 4500, y = power_pratt + 0.05,
+           label = sprintf("van der Vaart - Pratt limit  %.3f", power_pratt),
            colour = col_blind, size = 3.0, hjust = 1, alpha = 0.8) +
   labs(x      = expression(italic(n)~"per group (log scale)"),
        y      = "Power",
        colour = NULL, shape = NULL,
        title  = "WMW, equal groups") +
-  theme_classic(base_size = 11) +
+  theme_classic(base_size = 12) +
   theme(legend.position  = "bottom",
-        legend.text      = element_text(size = 8.5),
-        panel.grid.minor = element_blank(),
-        plot.title       = element_text(size = 10, face = "plain"))
+        panel.grid.minor = element_blank() )
 
 #
 p
 #
+# save it
+# gg_save(p, 'wmw_blind_spot.tiff', 15, 10, 1)
+
 
 
 ################################################################################
@@ -226,8 +225,3 @@ sessioninfo::session_info(pkgs = c('attached'))
 # 
 # ──────────────────────────────────────────────────────────────────────────
 #
-
-
-
-
-
